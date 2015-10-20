@@ -32,5 +32,9 @@ namespace TestApplication
       Process.Start("mailto:switcherlapp.97@gmail.com");
     }
 
-  }
+		private void btnClose_Click(object sender, EventArgs e)
+		{
+			this.Close();
+		}
+	}
 }
