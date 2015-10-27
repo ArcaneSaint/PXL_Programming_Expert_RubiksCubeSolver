@@ -22,6 +22,8 @@ namespace TestApplication
 		PluginCollection<CubeSolver> solverPlugins = new PluginCollection<CubeSolver>();
 		BindingList<IMove> rotations = new BindingList<IMove>();
 
+		CubeSolver currentSolver;
+
 		public FormMain()
 		{
 			InitializeComponent();
@@ -65,7 +67,8 @@ namespace TestApplication
 
 		private void solveToolStripMenuItem1_Click(object sender, EventArgs e)
 		{
-			DialogSolutionFinder dlg = new DialogSolutionFinder(new TwoPhaseAlgorithm(), this.cubeModel.Rubik, this);
+			if (currentSolver == null) { currentSolver = new TwoPhaseAlgorithm(); }
+			DialogSolutionFinder dlg = new DialogSolutionFinder(currentSolver, this.cubeModel.Rubik, this); //Step add 5MB to heap
 			if (dlg.ShowDialog() == DialogResult.OK)
 			{
 				rotations.Clear();

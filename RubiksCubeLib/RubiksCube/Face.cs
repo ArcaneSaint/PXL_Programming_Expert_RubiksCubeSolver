@@ -30,9 +30,6 @@ namespace RubiksCubeLib.RubiksCube
 			this.Position = position;
 		}
 
-
-
-
 		// **** PROPERTIES ****
 
 		/// <summary>
