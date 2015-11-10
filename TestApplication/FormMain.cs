@@ -14,6 +14,7 @@ using System.Windows.Forms;
 using TwoPhaseAlgorithmSolver;
 using BeginnerSolver;
 using FridrichSolver;
+using System.IO;
 
 namespace TestApplication
 {
@@ -21,13 +22,22 @@ namespace TestApplication
 	{
 		PluginCollection<CubeSolver> solverPlugins = new PluginCollection<CubeSolver>();
 		BindingList<IMove> rotations = new BindingList<IMove>();
-
-		CubeSolver currentSolver;
-
+		CubeSolver currentSolver = null;
 		public FormMain()
 		{
 			InitializeComponent();
+			solverPlugins.AddDll(System.IO.Path.GetFullPath("BeginnerSolver.dll"));
+			solverPlugins.AddDll(System.IO.Path.GetFullPath("FridrichSolver.dll"));
+			solverPlugins.AddDll(System.IO.Path.GetFullPath("TwoPhaseAlgorithmSolver.dll"));
 
+			foreach (var solver in solverPlugins.GetAll())
+			{
+				manageSolversToolStripMenuItem.DropDownItems.Add(solver.Name + " solver", null, (x, y) => currentSolver = solver);
+			}
+			if (solverPlugins.Count > 0)
+			{
+				currentSolver = solverPlugins[0];
+			}
 			//foreach (string path in Properties.Settings.Default.PluginPaths)
 			//{
 			//  solverPlugins.AddDll(path);
@@ -67,12 +77,23 @@ namespace TestApplication
 
 		private void solveToolStripMenuItem1_Click(object sender, EventArgs e)
 		{
-			if (currentSolver == null) { currentSolver = new TwoPhaseAlgorithm(); }
-			DialogSolutionFinder dlg = new DialogSolutionFinder(currentSolver, this.cubeModel.Rubik, this); //Step add 5MB to heap
-			if (dlg.ShowDialog() == DialogResult.OK)
+			//if (currentSolver == null) { currentSolver = new TwoPhaseAlgorithm(); }
+			//if (currentSolver == null) { currentSolver = new FridrichSolver.FridrichSolver(); }
+			//if (currentSolver == null) { currentSolver = new BeginnerSolver.BeginnerSolver(); }
+			if (currentSolver != null)
 			{
-				rotations.Clear();
-				dlg.Algorithm.Moves.ForEach(m => rotations.Add(m));
+				using (DialogSolutionFinder dlg = new DialogSolutionFinder(currentSolver, this.cubeModel.Rubik, this))
+				{
+
+					if (dlg.ShowDialog() == DialogResult.OK)
+					{
+						rotations.Clear();
+						dlg.Algorithm.Moves.ForEach(m => rotations.Add(m));
+					}
+				}
+			} else
+			{
+				MessageBox.Show("No solver selected");
 			}
 		}
 
@@ -131,7 +152,7 @@ namespace TestApplication
 
 		private void manageSolversToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			NotImplemented();
+
 		}
 
 		private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
